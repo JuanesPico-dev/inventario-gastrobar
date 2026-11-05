@@ -1,0 +1,7 @@
+Flask==3.1.3
+Flask-SQLAlchemy==3.1.1
+PyMySQL==1.1.1
+pymongo==4.10.1
+python-dotenv==1.0.1
+# solo para pruebas sin tener MongoDB instalado (MONGO_URI=mongomock://)
+mongomock==4.3.0
