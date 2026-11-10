@@ -12,12 +12,14 @@ from datetime import datetime
 from flask import Blueprint, request, jsonify
 from extensions import db, mongo
 from models import Producto
+from seguridad import rol_requerido
 from utils import error, registrar_log, doc_a_json
 
 bp = Blueprint("fichas", __name__, url_prefix="/api/fichas")
 
 
 @bp.get("")
+@rol_requerido()
 def listar():
     """?tipo=cerveza  o  ?etiqueta=importado"""
     filtro = {}
@@ -29,12 +31,14 @@ def listar():
 
 
 @bp.get("/<int:producto_id>")
+@rol_requerido()
 def obtener(producto_id):
     doc = mongo.fichas.find_one({"producto_id": producto_id})
     return jsonify(doc_a_json(doc)) if doc else error("Ficha no encontrada", 404)
 
 
 @bp.post("")
+@rol_requerido("admin")
 def crear():
     data = request.get_json() or {}
     producto_id = data.get("producto_id")
@@ -59,6 +63,7 @@ def crear():
 
 
 @bp.put("/<int:producto_id>")
+@rol_requerido("admin")
 def actualizar(producto_id):
     """Se pueden mandar atributos nuevos sin tocar la estructura de nada."""
     if not mongo.fichas.find_one({"producto_id": producto_id}):
@@ -77,6 +82,7 @@ def actualizar(producto_id):
 
 
 @bp.delete("/<int:producto_id>")
+@rol_requerido("admin")
 def eliminar(producto_id):
     res = mongo.fichas.delete_one({"producto_id": producto_id})
     if res.deleted_count == 0:

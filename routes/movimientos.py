@@ -9,10 +9,11 @@ Son MUCHOS registros (alta frecuencia) y cada tipo trae datos diferentes:
 Por eso van en Mongo, pero el stock oficial vive en MySQL.
 """
 from datetime import datetime, timedelta
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 from pymongo import DESCENDING
 from extensions import db, mongo
 from models import Producto
+from seguridad import rol_requerido
 from utils import error, registrar_log, doc_a_json, id_valido
 
 bp = Blueprint("movimientos", __name__, url_prefix="/api/movimientos")
@@ -21,6 +22,7 @@ TIPOS = {"entrada": 1, "salida": -1, "merma": -1, "ajuste": 1}  # signo sobre el
 
 
 @bp.get("")
+@rol_requerido()
 def listar():
     """Filtros opcionales: ?producto_id=1&tipo=salida&dias=7&limite=50"""
     filtro = {}
@@ -37,6 +39,7 @@ def listar():
 
 
 @bp.get("/<id>")
+@rol_requerido()
 def obtener(id):
     oid = id_valido(id)
     doc = mongo.movimientos.find_one({"_id": oid}) if oid else None
@@ -44,6 +47,7 @@ def obtener(id):
 
 
 @bp.post("")
+@rol_requerido()
 def crear():
     """
     LÓGICA DE NEGOCIO QUE TOCA LAS DOS BASES:
@@ -60,6 +64,9 @@ def crear():
 
     if tipo not in TIPOS:
         return error(f"tipo debe ser uno de: {', '.join(TIPOS)}")
+    # RBAC: el empleado solo registra ventas y pérdidas
+    if g.usuario.rol != "admin" and tipo not in ("salida", "merma"):
+        return error("Un empleado solo puede registrar salidas y mermas", 403)
     if not isinstance(cantidad, int) or cantidad == 0:
         return error("cantidad debe ser un entero distinto de 0")
     if tipo != "ajuste" and cantidad < 0:
@@ -87,7 +94,7 @@ def crear():
         "cantidad": cantidad,
         "stock_anterior": stock_anterior,
         "stock_resultante": nuevo_stock,
-        "usuario": data.get("usuario", "sin_usuario"),
+        "usuario": g.usuario.email,        # sale del token, no del body
         "motivo": data.get("motivo"),
         "detalle": data.get("detalle", {}),   # <- campo libre, cambia según el tipo
         "fecha": datetime.utcnow(),
@@ -113,6 +120,7 @@ def crear():
 
 
 @bp.put("/<id>")
+@rol_requerido("admin")
 def actualizar(id):
     """Solo deja corregir motivo y detalle. La cantidad NO se edita
     (si se equivocaron, se anula el movimiento y se crea otro)."""
@@ -125,11 +133,12 @@ def actualizar(id):
         return error("Solo se puede modificar 'motivo' y/o 'detalle'")
     cambios["editado_en"] = datetime.utcnow()
     mongo.movimientos.update_one({"_id": oid}, {"$set": cambios})
-    registrar_log("ACTUALIZAR", "movimiento", id, data)
+    registrar_log("ACTUALIZAR", "movimiento", id, data, usuario=g.usuario.email)
     return jsonify(doc_a_json(mongo.movimientos.find_one({"_id": oid})))
 
 
 @bp.delete("/<id>")
+@rol_requerido("admin")
 def eliminar(id):
     """Anula un movimiento: devuelve el stock en MySQL y lo borra de Mongo."""
     oid = id_valido(id)
@@ -150,6 +159,6 @@ def eliminar(id):
         db.session.rollback()
         return error(f"No se pudo anular: {e}", 500)
 
-    registrar_log("ELIMINAR", "movimiento", id, {"producto_id": mov["producto_id"]})
+    registrar_log("ELIMINAR", "movimiento", id, {"producto_id": mov["producto_id"]}, usuario=g.usuario.email)
     return jsonify({"mensaje": "Movimiento anulado y stock revertido",
                     "stock_actual": producto.stock_actual if producto else None})

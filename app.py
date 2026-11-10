@@ -6,7 +6,7 @@ Para correr:  python app.py   ->  http://localhost:5000
 """
 from flask import Flask, jsonify
 from config import Config
-from extensions import db, mongo
+from extensions import db, mongo, jwt
 
 
 def create_app(config=Config):
@@ -18,10 +18,11 @@ def create_app(config=Config):
     # Conectamos las dos bases de datos
     db.init_app(app)      # MySQL
     mongo.init_app(app)   # MongoDB
+    jwt.init_app(app)     # JWT
 
     # Registramos las rutas (blueprints)
-    from routes import categorias, proveedores, productos, movimientos, fichas, reportes
-    for modulo in (categorias, proveedores, productos, movimientos, fichas, reportes):
+    from routes import auth, usuarios, categorias, proveedores, productos, movimientos, fichas, reportes
+    for modulo in (auth, usuarios, categorias, proveedores, productos, movimientos, fichas, reportes):
         app.register_blueprint(modulo.bp)
 
     with app.app_context():

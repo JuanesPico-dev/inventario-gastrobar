@@ -2,6 +2,7 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
 from models import Proveedor
+from seguridad import rol_requerido
 from utils import error, registrar_log
 
 bp = Blueprint("proveedores", __name__, url_prefix="/api/proveedores")
@@ -10,17 +11,20 @@ CAMPOS = ["nombre", "nit", "telefono", "email"]
 
 
 @bp.get("")
+@rol_requerido()
 def listar():
     return jsonify([p.to_dict() for p in Proveedor.query.order_by(Proveedor.nombre).all()])
 
 
 @bp.get("/<int:id>")
+@rol_requerido()
 def obtener(id):
     p = db.session.get(Proveedor, id)
     return jsonify(p.to_dict()) if p else error("Proveedor no encontrado", 404)
 
 
 @bp.post("")
+@rol_requerido("admin")
 def crear():
     data = request.get_json() or {}
     if not data.get("nombre"):
@@ -33,6 +37,7 @@ def crear():
 
 
 @bp.put("/<int:id>")
+@rol_requerido("admin")
 def actualizar(id):
     p = db.session.get(Proveedor, id)
     if not p:
@@ -47,6 +52,7 @@ def actualizar(id):
 
 
 @bp.delete("/<int:id>")
+@rol_requerido("admin")
 def eliminar(id):
     p = db.session.get(Proveedor, id)
     if not p:

@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify
 from pymongo import DESCENDING
 from extensions import db, mongo
 from models import Producto, Categoria
+from seguridad import rol_requerido
 from utils import error, registrar_log, doc_a_json
 
 bp = Blueprint("productos", __name__, url_prefix="/api/productos")
@@ -15,6 +16,7 @@ CAMPOS = ["codigo_barras", "nombre", "unidad", "precio_compra", "precio_venta",
 
 
 @bp.get("")
+@rol_requerido()
 def listar():
     # filtro opcional: /api/productos?categoria_id=2
     q = Producto.query
@@ -24,12 +26,14 @@ def listar():
 
 
 @bp.get("/<int:id>")
+@rol_requerido()
 def obtener(id):
     p = db.session.get(Producto, id)
     return jsonify(p.to_dict()) if p else error("Producto no encontrado", 404)
 
 
 @bp.post("")
+@rol_requerido("admin")
 def crear():
     data = request.get_json() or {}
     if not data.get("nombre") or not data.get("categoria_id"):
@@ -47,6 +51,7 @@ def crear():
 
 
 @bp.put("/<int:id>")
+@rol_requerido("admin")
 def actualizar(id):
     p = db.session.get(Producto, id)
     if not p:
@@ -63,6 +68,7 @@ def actualizar(id):
 
 
 @bp.delete("/<int:id>")
+@rol_requerido("admin")
 def eliminar(id):
     p = db.session.get(Producto, id)
     if not p:
@@ -80,6 +86,7 @@ def eliminar(id):
 #  ENDPOINT QUE COMBINA SQL + NoSQL
 # ------------------------------------------------------------------
 @bp.get("/<int:id>/detalle")
+@rol_requerido()
 def detalle(id):
     """
     Junta en una sola respuesta:

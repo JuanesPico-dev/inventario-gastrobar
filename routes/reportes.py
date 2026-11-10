@@ -6,12 +6,14 @@ from flask import Blueprint, request, jsonify
 from pymongo import DESCENDING
 from extensions import db, mongo
 from models import Producto
+from seguridad import rol_requerido
 from utils import doc_a_json
 
 bp = Blueprint("reportes", __name__, url_prefix="/api")
 
 
 @bp.get("/reportes/stock-bajo")
+@rol_requerido("admin")
 def stock_bajo():
     """
     Productos con stock <= stock_minimo (MySQL) + cuánto se ha consumido
@@ -53,6 +55,7 @@ def stock_bajo():
 
 
 @bp.get("/reportes/mas-vendidos")
+@rol_requerido("admin")
 def mas_vendidos():
     """Top de productos por salidas (MongoDB) enriquecido con precio de venta (MySQL)."""
     dias = request.args.get("dias", 30, type=int)
@@ -84,6 +87,7 @@ def mas_vendidos():
 
 
 @bp.get("/logs")
+@rol_requerido("admin")
 def logs():
     """Últimos registros de actividad. ?entidad=producto&accion=CREAR&limite=20"""
     filtro = {k: request.args[k] for k in ("entidad", "accion", "usuario") if request.args.get(k)}

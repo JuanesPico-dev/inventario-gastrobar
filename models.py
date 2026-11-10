@@ -8,6 +8,7 @@ y que se relacionan entre sí con llaves foráneas.
 """
 from datetime import datetime
 from extensions import db
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class Categoria(db.Model):
@@ -77,4 +78,33 @@ class Producto(db.Model):
             "activo": self.activo,
             "categoria": self.categoria.nombre if self.categoria else None,
             "proveedor": self.proveedor.nombre if self.proveedor else None,
+        }
+
+class Usuario(db.Model):
+    __tablename__ = "usuarios"
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password_hash = db.Column(db.String(255), nullable=False)
+    rol = db.Column(db.String(20), nullable=False, default="empleado")  # admin | empleado
+    activo = db.Column(db.Boolean, nullable=False, default=True)
+    creado_en = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def set_password(self, clave):
+        # nunca guardamos la clave, solo su hash
+        self.password_hash = generate_password_hash(clave)
+
+    def check_password(self, clave):
+        # compara la clave que escriben con el hash guardado
+        return check_password_hash(self.password_hash, clave)
+
+    def to_dict(self):
+        # password_hash NO se devuelve nunca
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "email": self.email,
+            "rol": self.rol,
+            "activo": self.activo,
         }

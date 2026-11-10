@@ -1,7 +1,7 @@
 """Funciones de apoyo que usan varias rutas."""
 from datetime import datetime
 from bson import ObjectId
-from flask import jsonify
+from flask import jsonify, g
 from extensions import mongo
 
 
@@ -31,9 +31,12 @@ def id_valido(id_texto):
         return None
 
 
-def registrar_log(accion, entidad, entidad_id=None, datos=None, usuario="sistema"):
+def registrar_log(accion, entidad, entidad_id=None, datos=None, usuario=None):
     """Guarda en Mongo un registro de lo que pasó en la app.
     Cada log puede traer 'datos' distintos, por eso va en NoSQL."""
+    if usuario is None:
+        # si hay un usuario logueado, el log queda a su nombre
+        usuario = g.usuario.email if "usuario" in g else "sistema"
     mongo.logs.insert_one({
         "accion": accion,          # CREAR, ACTUALIZAR, ELIMINAR...
         "entidad": entidad,        # producto, movimiento, ficha...

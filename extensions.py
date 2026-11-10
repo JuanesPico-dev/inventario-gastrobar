@@ -6,9 +6,10 @@ Las demás partes del proyecto importan desde aquí.
 """
 from flask_sqlalchemy import SQLAlchemy
 from pymongo import MongoClient, DESCENDING
+from flask_jwt_extended import JWTManager
 
 db = SQLAlchemy()
-
+jwt = JWTManager()  
 
 class Mongo:
     """Envoltura sencilla para tener la base de Mongo a mano en toda la app."""
