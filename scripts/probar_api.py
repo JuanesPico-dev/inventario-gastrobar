@@ -17,9 +17,13 @@ from scripts.seed import sembrar  # noqa: E402
 salida = ["# Evidencias de ejecución (salida automática)\n"]
 
 
+TOKEN = {"valor": None}
+
+
 def llamar(metodo, url, body=None, titulo="", recortar=None):
     cliente = app.test_client()
-    r = getattr(cliente, metodo.lower())(url, json=body)
+    headers = {"Authorization": f"Bearer {TOKEN['valor']}"} if TOKEN["valor"] else {}
+    r = getattr(cliente, metodo.lower())(url, json=body, headers=headers)
     datos = r.get_json()
     mostrar = datos
     if recortar and isinstance(datos, list):
@@ -34,8 +38,18 @@ def llamar(metodo, url, body=None, titulo="", recortar=None):
 
 with app.app_context():
     sembrar()
+    # usuario admin de prueba (seed borra la tabla usuarios)
+    from extensions import db
+    from models import Usuario
+    admin = Usuario(nombre="Admin pruebas", email="admin@pruebas.com", rol="admin")
+    admin.set_password("admin12345")
+    db.session.add(admin)
+    db.session.commit()
 
 llamar("GET", "/api/salud", titulo="1. Conexión a las dos bases")
+_, login = llamar("POST", "/api/auth/login", {"email": "admin@pruebas.com", "password": "admin12345"},
+                  titulo="1b. Login como admin (JWT)")
+TOKEN["valor"] = login["access_token"]
 
 # --- CRUD SQL ---
 _, cat = llamar("POST", "/api/categorias", {"nombre": "Cócteles", "descripcion": "Preparados en barra"},

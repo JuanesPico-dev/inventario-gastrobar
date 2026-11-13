@@ -12,6 +12,32 @@ Respuesta:
 }
 ```
 
+## 1b. Login como admin (JWT)
+
+`POST /api/auth/login` → **200**
+
+Body enviado:
+```json
+{
+  "email": "admin@pruebas.com",
+  "password": "admin12345"
+}
+```
+
+Respuesta:
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc5NDI4Mjc0NywianRpIjoiMGQwYzRkYjAtZWVjOS00Y2E4LWEwOTYtN2ViOThhNDM5MzYxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3OTQyODI3NDcsImNzcmYiOiJjZjhjZmU4MS02MTRkLTRlYjItOTgyMy05N2NhZWE3Mjk2NDQiLCJleHAiOjE3OTQzMTE1NDcsInJvbCI6ImFkbWluIn0.fY4zIqfrnUaNIafVywBhjpYminBOTSwppUXzpa-Oh-w",
+  "usuario": {
+    "id": 1,
+    "nombre": "Admin pruebas",
+    "email": "admin@pruebas.com",
+    "rol": "admin",
+    "activo": true
+  }
+}
+```
+
 ## 2. CREATE categoría (MySQL)
 
 `POST /api/categorias` → **201**
@@ -180,8 +206,8 @@ Respuesta:
     "nacional"
   ],
   "notas": null,
-  "actualizado": "2026-11-04T02:11:58.853913",
-  "_id": "6aea946edff010f5ec884985"
+  "actualizado": "2026-11-10T03:52:27.067805",
+  "_id": "6af294fbf7a297bda65abc7d"
 }
 ```
 
@@ -213,8 +239,8 @@ Respuesta:
     "nacional"
   ],
   "notas": null,
-  "actualizado": "2026-11-04T02:11:58.854000",
-  "_id": "6aea946edff010f5ec884985"
+  "actualizado": "2026-11-10T03:52:27.069000",
+  "_id": "6af294fbf7a297bda65abc7d"
 }
 ```
 
@@ -232,7 +258,7 @@ Respuesta:
       "nacional",
       "mas_pedida"
     ],
-    "actualizado": "2026-11-04T02:11:58.801000",
+    "actualizado": "2026-11-10T03:52:26.821000",
     "tipo": "cerveza",
     "atributos": {
       "grados_alcohol": 4.7,
@@ -240,7 +266,7 @@ Respuesta:
       "estilo": "lager",
       "retornable": true
     },
-    "_id": "6aea946edff010f5ec88486e"
+    "_id": "6af294faf7a297bda65abb65"
   },
   {
     "producto_id": 2,
@@ -248,7 +274,7 @@ Respuesta:
     "etiquetas": [
       "importada"
     ],
-    "actualizado": "2026-11-04T02:11:58.803000",
+    "actualizado": "2026-11-10T03:52:26.822000",
     "tipo": "cerveza",
     "atributos": {
       "grados_alcohol": 4.5,
@@ -257,7 +283,7 @@ Respuesta:
       "retornable": false,
       "pais_origen": "México"
     },
-    "_id": "6aea946edff010f5ec88486f"
+    "_id": "6af294faf7a297bda65abb66"
   }
 ]
 ```
@@ -290,14 +316,14 @@ Respuesta:
   "cantidad": 12,
   "stock_anterior": 4,
   "stock_resultante": 16,
-  "usuario": "jhon",
+  "usuario": "admin@pruebas.com",
   "motivo": "Pedido semanal",
   "detalle": {
     "factura_proveedor": "FV-2231",
     "lote": "L5521"
   },
-  "fecha": "2026-11-04T02:11:58.856718",
-  "_id": "6aea946edff010f5ec884988",
+  "fecha": "2026-11-10T03:52:27.074675",
+  "_id": "6af294fbf7a297bda65abc80",
   "alerta_stock_bajo": false
 }
 ```
@@ -329,14 +355,14 @@ Respuesta:
   "cantidad": 3,
   "stock_anterior": 16,
   "stock_resultante": 13,
-  "usuario": "mesero1",
+  "usuario": "admin@pruebas.com",
   "motivo": null,
   "detalle": {
     "mesa": 4,
     "comanda": 5120
   },
-  "fecha": "2026-11-04T02:11:58.860773",
-  "_id": "6aea946edff010f5ec88498a",
+  "fecha": "2026-11-10T03:52:27.079355",
+  "_id": "6af294fbf7a297bda65abc82",
   "alerta_stock_bajo": false
 }
 ```
@@ -363,7 +389,7 @@ Respuesta:
 
 ## 12. UPDATE movimiento (MongoDB)
 
-`PUT /api/movimientos/6aea946edff010f5ec88498a` → **200**
+`PUT /api/movimientos/6af294fbf7a297bda65abc82` → **200**
 
 Body enviado:
 ```json
@@ -381,21 +407,21 @@ Respuesta:
   "cantidad": 3,
   "stock_anterior": 16,
   "stock_resultante": 13,
-  "usuario": "mesero1",
+  "usuario": "admin@pruebas.com",
   "motivo": "Venta mesa 4 - cumpleaños",
   "detalle": {
     "mesa": 4,
     "comanda": 5120
   },
-  "fecha": "2026-11-04T02:11:58.860000",
-  "_id": "6aea946edff010f5ec88498a",
-  "editado_en": "2026-11-04T02:11:58.864000"
+  "fecha": "2026-11-10T03:52:27.079000",
+  "_id": "6af294fbf7a297bda65abc82",
+  "editado_en": "2026-11-10T03:52:27.085000"
 }
 ```
 
 ## 13. DELETE (anular) movimiento: se borra de Mongo y se revierte stock en MySQL
 
-`DELETE /api/movimientos/6aea946edff010f5ec884988` → **200**
+`DELETE /api/movimientos/6af294fbf7a297bda65abc80` → **200**
 
 Respuesta:
 ```json
@@ -459,7 +485,7 @@ Respuesta:
       "nacional",
       "mas_pedida"
     ],
-    "actualizado": "2026-11-04T02:11:58.801000",
+    "actualizado": "2026-11-10T03:52:26.821000",
     "tipo": "cerveza",
     "atributos": {
       "grados_alcohol": 4.7,
@@ -482,8 +508,8 @@ Respuesta:
         "mesa": 8,
         "comanda": 8634
       },
-      "fecha": "2026-11-03T22:11:58.807000",
-      "_id": "6aea946edff010f5ec88489a"
+      "fecha": "2026-11-09T22:52:26.828000",
+      "_id": "6af294faf7a297bda65abb91"
     },
     {
       "producto_id": 1,
@@ -498,8 +524,8 @@ Respuesta:
         "mesa": 5,
         "comanda": 6691
       },
-      "fecha": "2026-11-02T23:11:58.807000",
-      "_id": "6aea946edff010f5ec884899"
+      "fecha": "2026-11-08T23:52:26.828000",
+      "_id": "6af294faf7a297bda65abb90"
     },
     {
       "producto_id": 1,
@@ -514,8 +540,8 @@ Respuesta:
         "mesa": 1,
         "comanda": 2152
       },
-      "fecha": "2026-11-01T20:11:58.807000",
-      "_id": "6aea946edff010f5ec884898"
+      "fecha": "2026-11-07T20:52:26.828000",
+      "_id": "6af294faf7a297bda65abb8f"
     },
     {
       "producto_id": 1,
@@ -530,8 +556,8 @@ Respuesta:
         "mesa": 10,
         "comanda": 3478
       },
-      "fecha": "2026-10-31T23:11:58.807000",
-      "_id": "6aea946edff010f5ec884897"
+      "fecha": "2026-11-06T23:52:26.828000",
+      "_id": "6af294faf7a297bda65abb8e"
     },
     {
       "producto_id": 1,
@@ -546,8 +572,8 @@ Respuesta:
         "mesa": 3,
         "comanda": 2801
       },
-      "fecha": "2026-10-30T21:11:58.807000",
-      "_id": "6aea946edff010f5ec884896"
+      "fecha": "2026-11-05T21:52:26.828000",
+      "_id": "6af294faf7a297bda65abb8d"
     },
     {
       "producto_id": 1,
@@ -562,8 +588,8 @@ Respuesta:
         "mesa": 7,
         "comanda": 2019
       },
-      "fecha": "2026-10-29T20:11:58.807000",
-      "_id": "6aea946edff010f5ec884895"
+      "fecha": "2026-11-04T20:52:26.828000",
+      "_id": "6af294faf7a297bda65abb8c"
     },
     {
       "producto_id": 1,
@@ -578,8 +604,8 @@ Respuesta:
         "mesa": 7,
         "comanda": 7521
       },
-      "fecha": "2026-10-28T22:11:58.807000",
-      "_id": "6aea946edff010f5ec884894"
+      "fecha": "2026-11-03T22:52:26.828000",
+      "_id": "6af294faf7a297bda65abb8b"
     },
     {
       "producto_id": 1,
@@ -594,8 +620,8 @@ Respuesta:
         "factura_proveedor": "FV-732",
         "lote": "L1884"
       },
-      "fecha": "2026-10-28T14:11:58.807000",
-      "_id": "6aea946edff010f5ec884893"
+      "fecha": "2026-11-03T14:52:26.828000",
+      "_id": "6af294faf7a297bda65abb8a"
     },
     {
       "producto_id": 1,
@@ -610,8 +636,8 @@ Respuesta:
         "mesa": 10,
         "comanda": 6220
       },
-      "fecha": "2026-10-27T20:11:58.807000",
-      "_id": "6aea946edff010f5ec884892"
+      "fecha": "2026-11-02T20:52:26.828000",
+      "_id": "6af294faf7a297bda65abb89"
     },
     {
       "producto_id": 1,
@@ -626,8 +652,8 @@ Respuesta:
         "mesa": 5,
         "comanda": 5619
       },
-      "fecha": "2026-10-26T19:11:58.807000",
-      "_id": "6aea946edff010f5ec884891"
+      "fecha": "2026-11-01T19:52:26.828000",
+      "_id": "6af294faf7a297bda65abb88"
     }
   ],
   "fuentes": {
@@ -745,63 +771,63 @@ Respuesta:
   {
     "accion": "ELIMINAR",
     "entidad": "movimiento",
-    "entidad_id": "6aea946edff010f5ec884988",
-    "usuario": "sistema",
+    "entidad_id": "6af294fbf7a297bda65abc80",
+    "usuario": "admin@pruebas.com",
     "datos": {
       "producto_id": 10
     },
-    "fecha": "2026-11-04T02:11:58.869000",
-    "_id": "6aea946edff010f5ec88498d"
+    "fecha": "2026-11-10T03:52:27.092000",
+    "_id": "6af294fbf7a297bda65abc85"
   },
   {
     "accion": "ACTUALIZAR",
     "entidad": "movimiento",
-    "entidad_id": "6aea946edff010f5ec88498a",
-    "usuario": "sistema",
+    "entidad_id": "6af294fbf7a297bda65abc82",
+    "usuario": "admin@pruebas.com",
     "datos": {
       "motivo": "Venta mesa 4 - cumpleaños"
     },
-    "fecha": "2026-11-04T02:11:58.865000",
-    "_id": "6aea946edff010f5ec88498c"
+    "fecha": "2026-11-10T03:52:27.086000",
+    "_id": "6af294fbf7a297bda65abc84"
   },
   {
     "accion": "CREAR",
     "entidad": "movimiento",
-    "entidad_id": "6aea946edff010f5ec88498a",
-    "usuario": "mesero1",
+    "entidad_id": "6af294fbf7a297bda65abc82",
+    "usuario": "admin@pruebas.com",
     "datos": {
       "producto_id": 10,
       "tipo": "salida",
       "cantidad": 3
     },
-    "fecha": "2026-11-04T02:11:58.862000",
-    "_id": "6aea946edff010f5ec88498b"
+    "fecha": "2026-11-10T03:52:27.081000",
+    "_id": "6af294fbf7a297bda65abc83"
   },
   {
     "accion": "CREAR",
     "entidad": "movimiento",
-    "entidad_id": "6aea946edff010f5ec884988",
-    "usuario": "jhon",
+    "entidad_id": "6af294fbf7a297bda65abc80",
+    "usuario": "admin@pruebas.com",
     "datos": {
       "producto_id": 10,
       "tipo": "entrada",
       "cantidad": 12
     },
-    "fecha": "2026-11-04T02:11:58.859000",
-    "_id": "6aea946edff010f5ec884989"
+    "fecha": "2026-11-10T03:52:27.077000",
+    "_id": "6af294fbf7a297bda65abc81"
   },
   {
     "accion": "ACTUALIZAR",
     "entidad": "ficha",
     "entidad_id": 10,
-    "usuario": "sistema",
+    "usuario": "admin@pruebas.com",
     "datos": {
       "atributos": {
         "sabor": "tradicional"
       }
     },
-    "fecha": "2026-11-04T02:11:58.855000",
-    "_id": "6aea946edff010f5ec884987"
+    "fecha": "2026-11-10T03:52:27.070000",
+    "_id": "6af294fbf7a297bda65abc7f"
   }
 ]
 ```
